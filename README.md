@@ -19,7 +19,7 @@ git submodule add https://github.com/lymslive/dotAgent.git dotAgent
 
 To create soft links from dot directories to dotAgent subdirectories:
 ```bash
-cd dotAgent && bash dot_link.sh
+dotAgenti/link.sh
 ```
 
 ## Directories
