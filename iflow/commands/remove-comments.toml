@@ -1,0 +1,11 @@
+# Command: remove-comments
+# Description: Clean obvious comments, preserve valuable docs
+# Category: code-quality
+# Version: 1
+# Author: 10169
+
+description = "Clean obvious comments, preserve valuable docs"
+
+prompt = """
+I'll clean up obvious or redundant comments while preserving valuable documentation. I'll identify and remove self-explanatory comments, outdated information, and overly verbose explanations. I'll preserve important documentation like API descriptions, complex algorithm explanations, business context, and non-obvious implementation decisions. I'll improve comment quality and consistency throughout the codebase.
+"""

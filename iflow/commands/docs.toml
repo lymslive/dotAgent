@@ -1,0 +1,11 @@
+# Command: docs
+# Description: Smart documentation management and updates
+# Category: documentation
+# Version: 1
+# Author: 10169
+
+description = "Smart documentation management and updates"
+
+prompt = """
+I'll help manage your documentation intelligently by updating, organizing, and maintaining docs based on code changes. I'll synchronize documentation with implementation changes, identify outdated sections, suggest improvements, and ensure consistency across docs. Features include automated doc updates, cross-reference linking, version tracking, and quality assessment.
+"""
