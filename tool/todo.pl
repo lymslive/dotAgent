@@ -19,9 +19,9 @@ use warnings;
 #   - Section end: next line starting with "## TODO" (any), or a line of only dashes "---...", or EOF
 #   - No external CPAN modules required; pure perl5
 
-# to fix:
-# my $repo_root = find_repo_root();
-# my $todo_path = "$repo_root/task_todo.md";
+# Use ./task_todo.md relative to CWD. This is intentional: the tool is designed
+# to be invoked from the relevant module/project directory, supporting both
+# single-repo projects (run from root) and monorepos with per-module task files.
 my $todo_path = "./task_todo.md";
 
 @ARGV >= 1 && @ARGV <= 2 or die_usage();
@@ -222,23 +222,4 @@ sub locate_section {
         if ($lines[$i] =~ $next_todo_re || $lines[$i] =~ $sep_re) { $end = $i; last; }
     }
     return ($beg, $end);
-}
-
-# Find repository root by checking for .git directory
-sub find_repo_root {
-    require Cwd; require File::Basename; require File::Spec;
-    my $dir = File::Basename::dirname(File::Spec->rel2abs($0));
-    for (1..5) {
-        my $candidate = File::Spec->catdir($dir, '..');
-        $candidate = Cwd::realpath($candidate);
-        if (-d File::Spec->catdir($dir, '.git')) {
-            return $dir;
-        }
-        if (-d File::Spec->catdir($candidate, '.git')) {
-            return $candidate;
-        }
-        $dir = $candidate;
-    }
-    # Fallback to current working directory
-    return Cwd::getcwd();
 }

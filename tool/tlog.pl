@@ -39,9 +39,9 @@ sub parse_argument {
 # Parse task_log.md into header and sections, keeping only last n sections
 sub parse_task_log {
     my ($max_sections) = @_;
-	# to fix:
-#   my $repo_root = find_repo_root();
-#   my $log_path = "$repo_root/task_log.md";
+    # Use ./task_log.md relative to CWD. This is intentional: the tool is designed
+    # to be invoked from the relevant module/project directory, supporting both
+    # single-repo projects (run from root) and monorepos with per-module log files.
     my $log_path = "./task_log.md";
     
     open my $fh, '<', $log_path or die "ERROR: cannot open $log_path: $!\n";
@@ -86,23 +86,4 @@ sub parse_task_log {
     }
     
     return ($header, @sections);
-}
-
-# Find repository root by checking for .git directory
-sub find_repo_root {
-    require Cwd; require File::Basename; require File::Spec;
-    my $dir = File::Basename::dirname(File::Spec->rel2abs($0));
-    for (1..5) {
-        my $candidate = File::Spec->catdir($dir, '..');
-        $candidate = Cwd::realpath($candidate);
-        if (-d File::Spec->catdir($dir, '.git')) {
-            return $dir;
-        }
-        if (-d File::Spec->catdir($candidate, '.git')) {
-            return $candidate;
-        }
-        $dir = $candidate;
-    }
-    # Fallback to current working directory
-    return Cwd::getcwd();
 }
