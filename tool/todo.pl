@@ -10,17 +10,23 @@ use warnings;
 #     - Update the matching section by appending/merging a line:
 #       "### DONE:<task-id>" (multiple IDs separated by spaces). If a DONE line
 #       already exists, merge IDs (dedupe, preserve existing order, append new at end).
+#   perl script/todo.pl 0
+#     - Print the first valid (undone) TODO section
+#   perl script/todo.pl -1
+#     - Print the last valid (undone) TODO section
 # Notes:
 #   - Section start: lines like "## TODO:YYYY-MM-DD/n" (colon optional/any char/none between TODO and ID)
 #   - Section end: next line starting with "## TODO" (any), or a line of only dashes "---...", or EOF
 #   - No external CPAN modules required; pure perl5
 
-my $repo_root = find_repo_root();
-my $todo_path = "$repo_root/task_todo.md";
+# Use ./task_todo.md relative to CWD. This is intentional: the tool is designed
+# to be invoked from the relevant module/project directory, supporting both
+# single-repo projects (run from root) and monorepos with per-module task files.
+my $todo_path = "./task_todo.md";
 
 @ARGV >= 1 && @ARGV <= 2 or die_usage();
 my ($todo_id, $task_id) = @ARGV;
-$todo_id or die "ERROR: <todo-id> is empty\n";
+defined $todo_id && $todo_id ne '' or die "ERROR: <todo-id> is empty\n";
 
 if (defined $task_id) {
     $task_id =~ /\S/ or die "ERROR: <task-id> is empty\n";
@@ -33,6 +39,15 @@ close $fh;
 # Handle special case: -1 means find last valid TODO
 if ($todo_id eq '-1') {
     $todo_id = find_last_todo(\@lines);
+    if (!defined $todo_id) {
+        print STDERR "ERROR: No valid TODO section found\n";
+        exit 2;
+    }
+}
+
+# Handle special case: 0 means find first valid TODO
+if ($todo_id eq '0') {
+    $todo_id = find_first_todo(\@lines);
     if (!defined $todo_id) {
         print STDERR "ERROR: No valid TODO section found\n";
         exit 2;
@@ -101,6 +116,38 @@ close $ofh;
 print "OK: DONE updated for $todo_id with $task_id\n";
 exit 0;
 
+sub find_first_todo {
+    my ($lines_ref) = @_;
+    my @lines = @$lines_ref;
+
+    for my $i (0..$#lines) {
+        # Check if this is a TODO line
+        if ($lines[$i] =~ /^##\s*TODO\b/) {
+            # Check if it has an ID (format: YYYY-MM-DD/n)
+            if ($lines[$i] =~ /^##\s*TODO:?[:\s]*(\d{4}-\d{2}-\d{2}\/\d+)/) {
+                my $todo_id = $1;
+
+                # Check if this TODO section has no DONE marker
+                my ($beg, $end) = locate_section(\@lines, $todo_id);
+                if (defined $beg) {
+                    my $has_done = 0;
+                    for my $j ($beg .. $end-1) {
+                        if ($lines[$j] =~ /^###\s*DONE\s*:/) {
+                            $has_done = 1;
+                            last;
+                        }
+                    }
+                    if (!$has_done) {
+                        return $todo_id;
+                    }
+                }
+            }
+        }
+    }
+
+    return undef;
+}
+
 sub find_last_todo {
     my ($lines_ref) = @_;
     my @lines = @$lines_ref;
@@ -143,12 +190,14 @@ sub die_usage {
 Usage:
   perl script/todo.pl <todo-id>
   perl script/todo.pl <todo-id> <task-id>
-  perl script/todo.pl -1
+  perl script/todo.pl 0       # Print the first valid TODO section
+  perl script/todo.pl -1      # Print the last valid TODO section
 
 Examples:
   perl script/todo.pl 2025-10-16/1
   perl script/todo.pl 2025-10-16/1 20251016-123456
-  perl script/todo.pl -1  # Print the last valid TODO section
+  perl script/todo.pl 0       # Print the first valid (undone) TODO section
+  perl script/todo.pl -1      # Print the last valid (undone) TODO section
 USAGE
     exit 1;
 }
@@ -173,23 +222,4 @@ sub locate_section {
         if ($lines[$i] =~ $next_todo_re || $lines[$i] =~ $sep_re) { $end = $i; last; }
     }
     return ($beg, $end);
-}
-
-# Find repository root by checking for .git directory
-sub find_repo_root {
-    require Cwd; require File::Basename; require File::Spec;
-    my $dir = File::Basename::dirname(File::Spec->rel2abs($0));
-    for (1..5) {
-        my $candidate = File::Spec->catdir($dir, '..');
-        $candidate = Cwd::realpath($candidate);
-        if (-d File::Spec->catdir($dir, '.git')) {
-            return $dir;
-        }
-        if (-d File::Spec->catdir($candidate, '.git')) {
-            return $candidate;
-        }
-        $dir = $candidate;
-    }
-    # Fallback to current working directory
-    return Cwd::getcwd();
 }
