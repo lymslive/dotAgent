@@ -39,8 +39,10 @@ sub parse_argument {
 # Parse task_log.md into header and sections, keeping only last n sections
 sub parse_task_log {
     my ($max_sections) = @_;
-    my $repo_root = find_repo_root();
-    my $log_path = "$repo_root/task_log.md";
+	# to fix:
+#   my $repo_root = find_repo_root();
+#   my $log_path = "$repo_root/task_log.md";
+    my $log_path = "./task_log.md";
     
     open my $fh, '<', $log_path or die "ERROR: cannot open $log_path: $!\n";
     my @lines = <$fh>;
