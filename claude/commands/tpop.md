@@ -1,9 +1,10 @@
 ---
 description: "按 task todo log 工作流完成一个开发任务"
+disable-model-invocation: true
 ---
 
 这是一个典型的开发任务的工作流，是几个阶段的顺序组合。几乎每个阶段也有相应的独
-立的 slash 命令对应，可以在意外中断时临时手动调用后续阶段。
+立的 slash 自定义命令（技能）对应，可以在意外中断时临时手动调用后续阶段。
 
 ## 需求获取 (/todo)
 
@@ -41,7 +42,12 @@ perl ~/dotAgent/tool/todo.pl $1
 
 ## 文档同步 (/tdoc)
 
-如果当前任务对架构设计或用户接口有较大改动，请检查相关文档，作必要的同步更新。
+如果当前任务对架构设计或用户接口有较大改动，请检查相关文档，作必要的同步更新：
+- CLAUDE.md AGENTS.md
+- README.MD readme.md
+- docs/ 下有关用法或 api 说明的文档等
+
+只检查更新，不新增文档，无相关文档则忽略
 
 ## 提交阶段 (/gc)
 
@@ -50,7 +56,3 @@ perl ~/dotAgent/tool/todo.pl $1
 - 例行修改的 task_todo.md 与 task_log.md 没必要体现在提交消息，但需要提交这两
   个文件
 
-将提交 hash 附加到 `task_log.md` 末尾，增加三级标题 `### COMMIT: hash` ，再额
-外加一空行。可以取完整长 hash （40位）。
-
-不需再为此小修改单独提交，可在下次任务一并提交 `task_log.md` 。

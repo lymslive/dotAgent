@@ -1,5 +1,6 @@
 ---
 description: "提交当前暂存区文件"
+disable-model-invocation: true
 ---
 
 我已将待提交文件放到暂存区，请执行最终提交。
