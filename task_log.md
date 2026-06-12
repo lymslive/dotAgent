@@ -37,3 +37,6 @@
 
 - 测试切换两次导致出现 `~1` `~2` 两个备份文件，逻辑正常，用户已手动从 `~2` 恢复
 - 当前 `settings.json` 使用 ppio claude-sonnet 配置，工作正常
+
+### COMMIT: ecea05c4e4d5c48b53eb8719d005f39556cb93ed
+### COMMIT: e54447e9bbfcc2ebc81dd3b0a6ae7a551141cc25

@@ -1,0 +1,11 @@
+{
+    "--note": "配置说明",
+    "env": {
+        "ANTHROPIC_API_KEY": "sk_not-key",
+        "ANTHROPIC_BASE_URL": "https://api.ppio.com/anthropic",
+        "ANTHROPIC_MODEL": "pa/claude-sonnet-4-6",
+        "ANTHROPIC_SMALL_FAST_MODEL": "pa/claude-sonnet-4-6",
+        "API_TIMEOUT_MS": "3000000",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1"
+    }
+}
