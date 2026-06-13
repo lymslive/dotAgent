@@ -17,6 +17,9 @@ perl ~/dotAgent/tool/todo.pl $1
 脚本支持使用特定需求 ID 作为参数，或使用 0 自动查找第一个未完成的需求。
 需求 ID 在二级标题处，格式是 `yyyy-mm-dd/n` 。
 
+如果需求中有提及参考历史需求id ，也可用 `todo.pl <todo-id>` 读取；
+如果提及参考历史任务 id ，可用 `tlog.pl <task-id>` 读取。
+
 ## 实施阶段
 
 - 先仔细分析用户需求内容，评估可行性与合理性，在需求有疑义时可再咨询用户确认。
@@ -30,7 +33,7 @@ perl ~/dotAgent/tool/todo.pl $1
 
 以任务 ID 为二级标题在 `task_log.md` 末尾追加式作日志，参考已有格式。
 - 可读取原日志文件前 100 行与后 100 行作为参考；
-- 或用 `perl ~/dotAgent/tool/tlog.pl` 准确提取最后一条日志记录，也支持参数读最后 `n` 条；
+- 或用 `perl ~/dotAgent/tool/tlog.pl -n` 准确提取最后 `n` 条日志记录；
 - 注意只能追加到原文件末尾，不要覆盖原文件或修改中间原有内容；
 - 可以先覆盖式写入 `last_log.md` 临时文件；
   再用命令 `cat last_log.md >> task_log.md` 追加日志。
@@ -53,6 +56,6 @@ perl ~/dotAgent/tool/todo.pl $1
 
 最后将当前修改提交 git ，提交消息格式按常见的 `type:` 规范前缀，
 - 消息正文使用中文，描叙主要变更
-- 例行修改的 task_todo.md 与 task_log.md 没必要体现在提交消息，但需要提交这两
-  个文件
+- 例行修改的 task_todo.md 与 task_log.md 没必要体现在提交消息，但需要提交这两个文件
+- 提交后可能有 hook 自动往 task_log.md 追加 COMMIT hast 信息，不要再二次循环提交
 
