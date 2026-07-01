@@ -82,3 +82,35 @@
 - 可通过 `tlog.pl -1` 达到原效果
 
 ### COMMIT: 7cc20d62b01eb611266c1d422e07da18782a4076
+
+## TASK:20260701-092758
+-----------------------
+
+> TODO:2026-07-01/1
+
+### 任务概述
+
+优化 `cc-switch.pl` 脚本，支持快速切换回上次配置，并在列表显示中标记当前与上次配置。
+
+### 完成内容
+
+**settings.json 元信息**
+
+- 新增 `cc-switch` 子节点，记录 `current` 与 `last` 两个配置名
+- 每次切换自动更新 `current`，将旧 `current` 移至 `last`
+
+**last 特殊配置名**
+
+- `cc-switch.pl last` 切换回上次使用的配置，交换 `current` 与 `last` 记录
+- 切换到 `last` 时**不备份** `settings.json~n`，避免无意义的备份膨胀
+
+**--list / --List 增强**
+
+- 当前配置用 `*` 前缀置顶标记，上次配置用 `#` 前缀（仿 vim `#` 表示 alternate buffer 的习惯）
+- 其他配置前缀补两个空格，保持对齐
+- 异常情况：若记录的 `current`/`last` 在 `~/.claude/cc-switch/` 中找不到对应文件，仍列出配置名并标记 `[Error] Not Found in ~/.claude/cc-switch`
+- `--help` 中说明 `*` 和 `#` 标记含义
+
+**同步**
+
+- 更新后的脚本已同步复制到 `~/.claude/cc-switch.pl`

@@ -110,3 +110,51 @@ cc-switch.pl 用法：
 
 按习惯也加上 `-v|--version` 选项，打印版本号，目前是 `1.0` 。
 ### DONE: 20260613-222858
+
+## TODO:2026-07-01/1 claude/cc-switch.pl 优化
+
+在使用 cc-switch.pl 简易脚本时，经常频繁在两个模型配置中切换，因此想提供一个快
+捷命令。
+
+首先，在 `~/.claude/settings.json` 植入一个 `cc-switch` 子结点，记录当作配置与
+上一次使用的配置，如：
+```json
+{
+    "cc-switch": {
+        "current": "claude-sonnet",
+        "last": "deepseek-ccs"
+    }
+    // 其他配置
+}
+```
+
+额外 json 键，应该不影响 claude 正常使用吧。
+
+基于此信息，执行如下命令，将 `last` 当成一个特殊配置名，传为参数：
+```bash
+cc-switch.pl last
+```
+
+就切换为上次的配置，并将交换 `current` 与 `last` 的记录元信息。
+这种情况下，不必备份 `settings.json~n`
+
+同时，在 `--list|--List` 选项列出可用配置时，额外标记出 `current` 与 `last`。
+
+当前配置加前缀 `* current` ，上一次配置用 `# last` 前缀。
+该标记源于 vim 用 `#` 表示另一个 buffer 的习惯。
+
+将 `current` 与 `last`始终列在最上面，其他配置前缀补两个空格，保持对齐。
+
+异常情况：如果 `~/.claude/settings.json` 记录的 `current` 与 `last` 在
+`~/.claude/cc-switch/` 找不到对应的。则仍列出这两个配置名，但标记错误如：
+
+```bash
+cc-switch.pl --list | --List
+
+* current  [Error] Not Found in ~/.claude/cc-switch
+# last     [Error] Not Found in ~/.claude/cc-switch
+```
+
+最后，要将 cc-switch.pl 脚本同步拷到 ~/.claude/ 子目录下。
+
+### DONE: 20260701-092758

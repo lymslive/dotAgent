@@ -25,6 +25,11 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 切换时，先将主配置备份为 settings.json~1（轮换，最多保留 9 份历史），
 再用从配置的 env 节点完全替换主配置的 env 节点，其余主配置内容保留不变。
 
+切换记录保存在 ~/.claude/settings.json 的 cc-switch 子节点中：
+  { "cc-switch": { "current": "claude-sonnet", "last": "deepseek-ccs" } }
+
+特殊配置名 "last" 表示切换回上次使用的配置（不产生备份）。
+
 从配置文件可含 "--note" 字段（JSON 注释约定），用于描述该配置的用途。
 
 =head1 OPTIONS
@@ -33,7 +38,7 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 
 =item B<--list>
 
-列出 ~/.claude/cc-switch/ 下所有可用的从配置名。
+列出 ~/.claude/cc-switch/ 下所有可用的从配置名。* 标记当前配置，# 标记上次配置，二者置顶显示。
 
 =item B<--List>
 
@@ -57,10 +62,12 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 
 可以是：
 
-1. 从配置完整路径（如 ~/.claude/cc-switch/deepseek-ccs.json），
+1. 特殊名 "last"：切换回上次使用的配置，交换 current 与 last 记录，不备份。
+
+2. 从配置完整路径（如 ~/.claude/cc-switch/deepseek-ccs.json），
    方便在 ~/.claude 目录下利用 shell 补全：./cc-switch.pl cc-switch/deepseek-ccs.json
 
-2. 仅配置名，不含目录和 .json 后缀（如 deepseek-ccs），
+3. 仅配置名，不含目录和 .json 后缀（如 deepseek-ccs），
    脚本自动在 ~/.claude/cc-switch/ 目录查找对应文件。
 
 =back
@@ -73,7 +80,7 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 
 =head1 EXAMPLES
 
-  # 列出可用配置
+  # 列出可用配置（标记 current/last）
   cc-switch.pl --list
 
   # 列出配置及备注
@@ -84,6 +91,9 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 
   # 切换到 deepseek-ccs 配置
   cc-switch.pl deepseek-ccs
+
+  # 切换回上次使用的配置
+  cc-switch.pl last
 
   # 使用文件名补全（在 ~/.claude 目录下）
   ./cc-switch.pl cc-switch/deepseek-ccs.json
@@ -127,13 +137,24 @@ if ($opt_view) {
     exit 0;
 }
 
-switch_config($config_path);
+switch_config($config_path, $config_arg);
 exit 0;
 
 # -----------------------------------------------------------------------
 
 sub resolve_config {
     my ($arg) = @_;
+
+    # 特殊名 last：从元信息查找上次配置
+    if ($arg eq 'last') {
+        my $meta = load_metadata();
+        my $last_name = $meta->{last};
+        die "没有记录上次配置（未找到 cc-switch.last 元数据）\n"
+            unless defined $last_name && $last_name ne '';
+        my $path = "$SWITCH_DIR/$last_name.json";
+        die "上次配置文件不存在: $path\n" unless -f $path;
+        return $path;
+    }
 
     # 如果是文件路径（含 .json 或含 /），直接用（支持相对路径和绝对路径）
     if ($arg =~ /\.json$/ || $arg =~ m{/}) {
@@ -153,30 +174,79 @@ sub resolve_config {
 
 sub list_configs {
     my ($show_note) = @_;
+
+    # 读取元信息
+    my $meta    = load_metadata();
+    my $current = $meta->{current} // '';
+    my $last    = $meta->{last}    // '';
+
     my @files = glob("$SWITCH_DIR/*.json");
-    if (!@files) {
-        print "没有找到从配置文件（目录: $SWITCH_DIR）\n";
-        return;
+    my %exists = map {
+        my $n = $_;
+        $n =~ s{.*/}{};
+        $n =~ s/\.json$//;
+        ($n => 1)
+    } @files;
+
+    # 构建输出行列表：[prefix, name, error_or_undef]
+    my @rows;
+
+    if ($current ne '') {
+        my $err = $exists{$current} ? undef : '[Error] Not Found in ~/.claude/cc-switch';
+        push @rows, ['*', $current, $err];
     }
+
+    if ($last ne '' && $last ne $current) {
+        my $err = $exists{$last} ? undef : '[Error] Not Found in ~/.claude/cc-switch';
+        push @rows, ['#', $last, $err];
+    }
+
     for my $file (sort @files) {
         my $name = $file;
         $name =~ s{.*/}{};
         $name =~ s/\.json$//;
-        if ($show_note) {
-            my $note = read_note($file);
+        next if $name eq $current || $name eq $last;
+        push @rows, ['  ', $name, undef];
+    }
+
+    if (!@rows && !@files) {
+        print "没有找到从配置文件（目录: $SWITCH_DIR）\n";
+        return;
+    }
+
+    for my $row (@rows) {
+        my ($prefix, $name, $err) = @$row;
+
+        # 标记符 * / # 对齐到 2 字符；普通行前缀为 "  "
+        my $padded_prefix = ($prefix eq '  ') ? '  ' : sprintf("%-2s", $prefix);
+
+        if (defined $err) {
+            printf "%s  %s  %s\n", $padded_prefix, $name, $err;
+        } elsif ($show_note) {
+            my $note = ($prefix ne '  ' || $exists{$name}) ? read_note("$SWITCH_DIR/$name.json") : undef;
             if (defined $note && $note ne '') {
-                printf "%-24s  %s\n", $name, $note;
+                printf "%s  %-24s  %s\n", $padded_prefix, $name, $note;
             } else {
-                print "$name\n";
+                printf "%s  %s\n", $padded_prefix, $name;
             }
         } else {
-            print "$name\n";
+            printf "%s  %s\n", $padded_prefix, $name;
         }
     }
 }
 
+sub load_metadata {
+    return {} unless -f $SETTINGS;
+    my $text = slurp($SETTINGS);
+    my $data = eval { JSON::PP->new->relaxed->decode($text) };
+    return {} unless defined $data && ref($data) eq 'HASH';
+    my $meta = $data->{'cc-switch'};
+    return (ref($meta) eq 'HASH') ? $meta : {};
+}
+
 sub read_note {
     my ($path) = @_;
+    return undef unless -f $path;
     my $json_text = slurp($path);
     my $data = eval { JSON::PP->new->relaxed->decode($json_text) };
     return undef unless defined $data && ref($data) eq 'HASH';
@@ -195,7 +265,8 @@ sub view_config {
 }
 
 sub switch_config {
-    my ($sub_path) = @_;
+    my ($sub_path, $orig_arg) = @_;
+    my $is_last = (defined $orig_arg && $orig_arg eq 'last');
 
     # 读取主配置
     die "主配置文件不存在: $SETTINGS\n" unless -f $SETTINGS;
@@ -212,21 +283,33 @@ sub switch_config {
         die "从配置中没有找到有效的 env 节点: $sub_path\n";
     }
 
+    # 提取配置名
+    my $new_name = $sub_path;
+    $new_name =~ s{.*/}{};
+    $new_name =~ s/\.json$//;
+
+    # 更新 cc-switch 元信息
+    my $meta = ref($main_data->{'cc-switch'}) eq 'HASH' ? $main_data->{'cc-switch'} : {};
+    if ($is_last) {
+        # 切换到 last：交换 current 与 last，不备份
+        ($meta->{current}, $meta->{last}) = ($meta->{last}, $meta->{current});
+    } else {
+        $meta->{last}    = $meta->{current} // '';
+        $meta->{current} = $new_name;
+    }
+    $main_data->{'cc-switch'} = $meta;
+
     # 用从配置的 env 替换主配置的 env
     $main_data->{env} = $sub_data->{env};
 
-    # 写回主配置前先备份（轮换 ~1..~9）
-    backup_settings();
+    # 写回主配置前先备份（切换到 last 时不备份）
+    backup_settings() unless $is_last;
 
     # 写回主配置（pretty 格式，保持可读性）
     my $new_text = JSON::PP->new->utf8->pretty->indent_length(2)->canonical(0)->encode($main_data);
     spew($SETTINGS, $new_text);
 
-    # 提取配置名用于提示
-    my $name = $sub_path;
-    $name =~ s{.*/}{};
-    $name =~ s/\.json$//;
-    print "已切换到: $name\n";
+    print "已切换到: $new_name\n";
     if (exists $sub_data->{'--note'}) {
         print "备注: $sub_data->{'--note'}\n";
     }
@@ -270,20 +353,22 @@ sub print_help {
 用法: cc-switch.pl [选项] [配置名]
 
 选项:
-  --list    列出可用的从配置名
+  --list    列出可用的从配置名（* 当前配置，# 上次配置）
   --List    列出配置名及 --note 注释
   --view    打印指定从配置的 JSON 内容（不切换）
   --help    显示此帮助信息
 
 配置名可以是:
-  deepseek-ccs              从 ~/.claude/cc-switch/ 查找 deepseek-ccs.json
-  cc-switch/deepseek-ccs.json  完整路径（相对或绝对），支持 shell 补全
+  last                          切换回上次使用的配置（交换 current/last，不备份）
+  deepseek-ccs                  从 ~/.claude/cc-switch/ 查找 deepseek-ccs.json
+  cc-switch/deepseek-ccs.json   完整路径（相对或绝对），支持 shell 补全
 
 示例:
   cc-switch.pl --list
   cc-switch.pl --List
   cc-switch.pl --view deepseek-ccs
   cc-switch.pl deepseek-ccs
+  cc-switch.pl last
   ./cc-switch.pl cc-switch/deepseek-ccs.json
 
 运行 `perldoc cc-switch.pl` 查看详细文档。
