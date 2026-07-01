@@ -38,7 +38,7 @@ cc-switch.pl - 切换 Claude Code 的 API 配置
 
 =item B<--list>
 
-列出 ~/.claude/cc-switch/ 下所有可用的从配置名。* 标记当前配置，# 标记上次配置，二者置顶显示。
+列出 ~/.claude/cc-switch/ 下所有可用的从配置名。% 标记当前配置，# 标记上次配置，二者置顶显示。
 
 =item B<--List>
 
@@ -193,7 +193,7 @@ sub list_configs {
 
     if ($current ne '') {
         my $err = $exists{$current} ? undef : '[Error] Not Found in ~/.claude/cc-switch';
-        push @rows, ['*', $current, $err];
+        push @rows, ['%', $current, $err];
     }
 
     if ($last ne '' && $last ne $current) {
@@ -217,20 +217,20 @@ sub list_configs {
     for my $row (@rows) {
         my ($prefix, $name, $err) = @$row;
 
-        # 标记符 * / # 对齐到 2 字符；普通行前缀为 "  "
+        # 标记符 % / # 对齐到 2 字符；普通行前缀为 "  "
         my $padded_prefix = ($prefix eq '  ') ? '  ' : sprintf("%-2s", $prefix);
 
         if (defined $err) {
-            printf "%s  %s  %s\n", $padded_prefix, $name, $err;
+            printf "%s%s  %s\n", $padded_prefix, $name, $err;
         } elsif ($show_note) {
             my $note = ($prefix ne '  ' || $exists{$name}) ? read_note("$SWITCH_DIR/$name.json") : undef;
             if (defined $note && $note ne '') {
-                printf "%s  %-24s  %s\n", $padded_prefix, $name, $note;
+                printf "%s%-24s  %s\n", $padded_prefix, $name, $note;
             } else {
-                printf "%s  %s\n", $padded_prefix, $name;
+                printf "%s%s\n", $padded_prefix, $name;
             }
         } else {
-            printf "%s  %s\n", $padded_prefix, $name;
+            printf "%s%s\n", $padded_prefix, $name;
         }
     }
 }
@@ -353,7 +353,7 @@ sub print_help {
 用法: cc-switch.pl [选项] [配置名]
 
 选项:
-  --list    列出可用的从配置名（* 当前配置，# 上次配置）
+  --list    列出可用的从配置名（% 当前配置，# 上次配置）
   --List    列出配置名及 --note 注释
   --view    打印指定从配置的 JSON 内容（不切换）
   --help    显示此帮助信息
