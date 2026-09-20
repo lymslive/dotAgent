@@ -1,7 +1,7 @@
 {
     "--note": "ccs 部门共用 ds 官方模型",
     "env": {
-        "ANTHROPIC_AUTH_TOKEN":"sk-75bf89c0a9ce45aab394dd1e97cf3420",
+        "ANTHROPIC_AUTH_TOKEN":"sk-not-key",
         "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-flash[1m]",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-flash[1m]",

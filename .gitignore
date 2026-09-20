@@ -2,3 +2,4 @@ last_log.tmp
 local-*
 *.local.md
 *.tmp
+*.bak

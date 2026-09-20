@@ -33,7 +33,7 @@ perl ~/dotAgent/tool/todo.pl $1
 
 以任务 ID 为二级标题在 `task_log.md` 末尾追加式作日志，参考已有格式。
 - 可读取原日志文件前 100 行与后 100 行作为参考；
-- 或用 `perl ~/dotAgent/tool/tlog.pl -n` 准确提取最后 `n` 条日志记录；
+- 或用 `perl ~/dotAgent/tool/tlog.pl -1` 准确提取最后 `1` 条日志记录（也支持 -2 -n）；
 - 注意只能追加到原文件末尾，不要覆盖原文件或修改中间原有内容；
 - 可以先覆盖式写入 `last_log.md` 临时文件；
   再用命令 `cat last_log.md >> task_log.md` 追加日志。

@@ -81,3 +81,4 @@
 - 原 tlog.pl 的 `tlog.pl 1` 语义改变：原意为最后 1 条，现为第 2 条（0-indexed）
 - 可通过 `tlog.pl -1` 达到原效果
 
+### COMMIT: 7cc20d62b01eb611266c1d422e07da18782a4076

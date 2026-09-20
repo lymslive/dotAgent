@@ -1,7 +1,7 @@
 {
     "--note": "京东云 GLM-5.2 模型",
     "env": {
-        "ANTHROPIC_API_KEY": "LYKJ-uSPMXgXl+LQJV0cPvhndkdoEfi2KKVV+NdahRv7tMSc=",
+        "ANTHROPIC_API_KEY": "key",
         "ANTHROPIC_BASE_URL": "https://agentrs.jd.com/api/saas/openai-u",
         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-5.2",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-5.2",
