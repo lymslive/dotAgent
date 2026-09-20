@@ -1,0 +1,11 @@
+{
+    "--note": "个人尝试的 deepseek Key",
+    "env": {
+        "ANTHROPIC_API_KEY": "sk-07d9a7e20bcc41e991d4d1afe3379494",
+        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+        "ANTHROPIC_MODEL": "deepseek-chat",
+        "ANTHROPIC_SMALL_FAST_MODEL": "deepseek-chat",
+        "API_TIMEOUT_MS": "3000000",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1
+    }
+}

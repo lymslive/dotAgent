@@ -1,7 +1,7 @@
 {
-    "--note": "配置说明",
+    "--note": "最先使用的欧派去 sonnet 模型",
     "env": {
-        "ANTHROPIC_API_KEY": "sk_not-key",
+        "ANTHROPIC_API_KEY": "sk_DWzLdTjz8qhI0j-kT69E-2Yoor4A804EaxLc2374PMA",
         "ANTHROPIC_BASE_URL": "https://api.ppio.com/anthropic",
         "ANTHROPIC_MODEL": "pa/claude-sonnet-4-6",
         "ANTHROPIC_SMALL_FAST_MODEL": "pa/claude-sonnet-4-6",

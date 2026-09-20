@@ -1,8 +1,8 @@
 {
-    "--note": "ccs 部门共用 ds 官方模型",
+    "--note": "公司部门转个人 api 的 ds 官方模型",
     "env": {
-        "ANTHROPIC_AUTH_TOKEN":"sk-75bf89c0a9ce45aab394dd1e97cf3420",
-        "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+        "ANTHROPIC_AUTH_TOKEN":"sk-y3nInN2M8MZBwHzc4VH8qqx94wHGkgso9i93bi1VArGV0ber",
+        "ANTHROPIC_BASE_URL": "https://newapi-devops.szlanyou.com",
         "ANTHROPIC_DEFAULT_HAIKU_MODEL": "deepseek-flash[1m]",
         "ANTHROPIC_DEFAULT_OPUS_MODEL": "deepseek-flash[1m]",
         "ANTHROPIC_DEFAULT_SONNET_MODEL": "deepseek-flash[1m]",

@@ -1,0 +1,12 @@
+{
+    "--note": "京东云 opus 模型",
+    "env": {
+        "ANTHROPIC_API_KEY": "LYKJ-uSPMXgXl+LQJV0cPvhndkdoEfi2KKVV+NdahRv7tMSc=",
+        "ANTHROPIC_BASE_URL": "https://agentrs.jd.com/api/saas/openai-u",
+        "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-opus-4-6",
+        "ANTHROPIC_DEFAULT_OPUS_MODEL": "claude-opus-4-6",
+        "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-opus-4-6",
+        "ANTHROPIC_MODEL": "claude-opus-4-6",
+        "ANTHROPIC_REASONING_MODEL": "claude-opus-4-6"
+    }
+}

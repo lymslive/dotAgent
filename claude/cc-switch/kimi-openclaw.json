@@ -1,0 +1,11 @@
+{
+    "--note": "当初公司为推使用 openclaw 申请的 key",
+    "env": {
+        "ANTHROPIC_API_KEY": "sk-1bmM7F98BgERLMZ1FrYeuN6z0yqFS0HkDakXrT9msQRxDsaK",
+        "ANTHROPIC_BASE_URL": "https://api.moonshot.cn/anthropic/",
+        "ANTHROPIC_MODEL": "kimi-k2.5",
+        "ANTHROPIC_SMALL_FAST_MODEL": "kimi-k2.5",
+        "API_TIMEOUT_MS": "3000000",
+        "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": 1
+    }
+}
