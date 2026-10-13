@@ -181,11 +181,16 @@ sub parse_sections {
                 title => $lines[$i],
                 beg   => $i,
             };
-        } elsif ($lines[$i] =~ /^---+\s*$/ && $current) {
-            $current->{end} = $i;
-            $current->{done} = _section_has_done(\@lines, $current->{beg}, $i);
-            push @sections, $current;
-            $current = undef;
+        } elsif ($lines[$i] =~ /^##\s*TODO/ || $lines[$i] =~ /^---+\s*$/) {
+            # Any other "## TODO" heading (not yet numbered) or a horizontal
+            # rule ends the current section; unnumbered blocks are skipped
+            # since they carry no id to read or list them by.
+            if ($current) {
+                $current->{end} = $i;
+                $current->{done} = _section_has_done(\@lines, $current->{beg}, $i);
+                push @sections, $current;
+                $current = undef;
+            }
         }
     }
 

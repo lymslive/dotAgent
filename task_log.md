@@ -114,3 +114,7 @@
 **同步**
 
 - 更新后的脚本已同步复制到 `~/.claude/cc-switch.pl`
+
+### COMMIT: 944f742c1764663a58e7d61f09dfe3661023fd6a
+
+### COMMIT: 37a1addc1c61c6e520b98e636174dee8b145548b

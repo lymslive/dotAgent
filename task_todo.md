@@ -158,3 +158,5 @@ cc-switch.pl --list | --List
 最后，要将 cc-switch.pl 脚本同步拷到 ~/.claude/ 子目录下。
 
 ### DONE: 20260701-092758
+
+`*` 改为为 `%` 表示 current
