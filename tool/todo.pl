@@ -181,10 +181,11 @@ sub parse_sections {
                 title => $lines[$i],
                 beg   => $i,
             };
-        } elsif ($lines[$i] =~ /^##\s*TODO/ || $lines[$i] =~ /^---+\s*$/) {
-            # Any other "## TODO" heading (not yet numbered) or a horizontal
-            # rule ends the current section; unnumbered blocks are skipped
-            # since they carry no id to read or list them by.
+        } elsif ($lines[$i] =~ /^##\s*TODO/) {
+            # Any other "## TODO" heading (not yet numbered) ends the current
+            # section; unnumbered blocks are skipped since they carry no id to
+            # read or list them by. Horizontal rules are ordinary content and
+            # must not truncate a section description.
             if ($current) {
                 $current->{end} = $i;
                 $current->{done} = _section_has_done(\@lines, $current->{beg}, $i);
@@ -220,7 +221,7 @@ sub find_section {
         if ($lines_ref->[$i] =~ $re) {
             my $end = scalar @$lines_ref;
             for my $j ($i + 1 .. $#$lines_ref) {
-                if ($lines_ref->[$j] =~ /^##\s*TODO/ || $lines_ref->[$j] =~ /^---+\s*$/) {
+                if ($lines_ref->[$j] =~ /^##\s*TODO/) {
                     $end = $j;
                     last;
                 }
